@@ -1,1 +1,14 @@
-[{"user": "ID***559", "key": "SP-B6873A", "type": "TEMP", "date": "10:19"}]
+[
+    {
+        "user": "ID***559",
+        "key": "SP-B6873A",
+        "type": "TEMP",
+        "date": "10:19"
+    },
+    {
+        "key": "SP-C1A80D",
+        "sub_link": "https://raw.githubusercontent.com/sitespinogrz/VPN/main/subs/rv34mvp8.txt",
+        "expiry": 1780726752,
+        "user": "ID***559"
+    }
+]
