@@ -6,82 +6,80 @@
     <title>spinogrzVPN | CONTROL PANEL</title>
     <style>
         :root { --red: #ff0000; --dark: #0a0000; }
-        body { background: var(--dark); color: var(--red); font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; overflow-x: hidden; }
-        .container { background: rgba(20, 0, 0, 0.9); border: 2px solid var(--red); padding: 30px; width: 90%; max-width: 500px; box-shadow: 0 0 20px var(--red); text-align: center; }
-        .glitch { font-size: 1.8rem; font-weight: bold; text-transform: uppercase; margin-bottom: 20px; text-shadow: 2px 2px var(--red); }
-        input { background: #000; border: 1px solid var(--red); color: var(--red); padding: 12px; width: 100%; box-sizing: border-box; text-align: center; font-size: 1.2rem; outline: none; margin-bottom: 20px; }
-        .btn { background: var(--red); color: #000; border: none; padding: 15px; width: 100%; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.3s; margin: 5px 0; }
+        body { background: var(--dark); color: var(--red); font-family: 'Courier New', monospace; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .box { background: rgba(15, 0, 0, 0.95); border: 2px solid var(--red); padding: 30px; width: 90%; max-width: 450px; box-shadow: 0 0 25px var(--red); text-align: center; }
+        h1 { font-size: 1.5rem; text-transform: uppercase; letter-spacing: 3px; margin-bottom: 20px; }
+        input { background: #000; border: 1px solid var(--red); color: var(--red); padding: 12px; width: 100%; box-sizing: border-box; text-align: center; font-size: 1.2rem; outline: none; margin-bottom: 15px; }
+        .btn { background: var(--red); color: #000; border: none; padding: 15px; width: 100%; font-weight: bold; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
         .btn:hover { background: #fff; box-shadow: 0 0 15px #fff; }
-        #dashboard { display: none; text-align: left; }
-        .timer { font-size: 1.5rem; color: #fff; background: #330000; padding: 10px; margin: 15px 0; border-radius: 5px; text-align: center; border: 1px dashed var(--red); }
-        .config-area { background: #000; border: 1px solid #440000; padding: 10px; font-size: 0.8rem; overflow-wrap: break-word; color: #888; margin-bottom: 10px; }
-        .status-node { color: #00ff00; font-size: 0.8rem; margin-bottom: 15px; }
+        #dashboard { display: none; }
+        .timer { font-size: 1.8rem; color: #fff; background: #220000; padding: 15px; margin: 15px 0; border: 1px dashed var(--red); }
+        .link-box { background: #000; border: 1px solid #440000; padding: 10px; font-size: 0.7rem; color: #777; word-break: break-all; margin-top: 10px; }
+        .status { font-size: 0.8rem; color: #00ff00; margin-bottom: 10px; }
     </style>
 </head>
 <body>
 
-<div class="container" id="loginPage">
-    <div class="glitch">TERMINAL LOGIN</div>
-    <p>ВВЕДИТЕ ВАШ ПРИВАТНЫЙ КОД:</p>
-    <input type="text" id="accessKey" placeholder="SP-XXXXXX">
-    <button class="btn" onclick="login()">АВТОРИЗАЦИЯ</button>
+<div class="box" id="loginPage">
+    <h1>SYSTEM AUTH</h1>
+    <p>ВВЕДИТЕ ВАШ КОД ДОСТУПА:</p>
+    <input type="text" id="passInput" placeholder="SP-XXXXXX">
+    <button class="btn" onclick="auth()">ПОДЛЮЧИТЬСЯ</button>
 </div>
 
-<div class="container" id="dashboard">
-    <div class="glitch" style="font-size: 1.2rem;">SYSTEM UNLOCKED</div>
-    <div class="status-node">● СЕРВЕР: ONLINE | ЗАЩИТА: ACTIVE</div>
+<div class="box" id="dashboard">
+    <div class="status">● SECURE CONNECTION ESTABLISHED</div>
+    <h1>spinogrzVPN</h1>
     
-    <label>ДО ОКОНЧАНИЯ ДОСТУПА:</label>
-    <div class="timer" id="countdown">--:--:--:--</div>
+    <label>ВРЕМЯ ДО ИСТЕЧЕНИЯ:</label>
+    <div class="timer" id="clock">00:00:00</div>
 
-    <label>ВАША ПЕРСОНАЛЬНАЯ ССЫЛКА (SUBSCRIPTION):</label>
-    <div class="config-area" id="subLinkDisplay">Загрузка...</div>
-    <button class="btn" onclick="copySub()">КОПИРОВАТЬ ССЫЛКУ</button>
+    <button class="btn" onclick="copyLink()">СКОПИРОВАТЬ ССЫЛКУ ВПН</button>
+    <div class="link-box" id="urlDisplay">loading...</div>
 
-    <div style="margin-top: 20px; font-size: 0.8rem; color: #ccc;">
-        <b>ИНСТРУКЦИЯ:</b><br>
-        1. Скопируйте ссылку выше.<br>
-        2. Вставьте в v2rayNG / Hiddify / Shadowrocket.<br>
-        3. Обновите подписки в приложении.
-    </div>
-    <button class="btn" style="background: #330000; color: #ff0000; margin-top: 20px;" onclick="location.reload()">ВЫХОД</button>
+    <p style="font-size: 0.7rem; color: #555; margin-top: 20px;">
+        ИНСТРУКЦИЯ: Скопируйте ссылку и вставьте её в приложение v2rayNG / Hiddify в раздел подписок.
+    </p>
+    <button class="btn" style="background:#220000; color:var(--red); margin-top:10px;" onclick="location.reload()">ВЫХОД</button>
 </div>
 
 <script>
     const REPO = "sitespinogrz/VPN";
-    let currentUser = null;
+    let user = null;
 
-    async function login() {
-        const key = document.getElementById('accessKey').value.trim();
+    async function auth() {
+        const key = document.getElementById('passInput').value.trim();
         try {
-            const res = await fetch(`https://raw.githubusercontent.com/${REPO}/main/users.json?t=${Date.now()}`);
-            const users = await res.json();
-            currentUser = users.find(u => u.key === key);
+            const res = await fetch(`https://raw.githubusercontent.com/${REPO}/main/users.json?v=${Date.now()}`);
+            const data = await res.json();
+            user = data.find(u => u.key === key);
 
-            if (currentUser) {
-                showDashboard();
+            if (user) {
+                document.getElementById('loginPage').style.display = 'none';
+                document.getElementById('dashboard').style.display = 'block';
+                document.getElementById('urlDisplay').innerText = user.sub_link;
+                startClock(user.expiry);
             } else {
-                alert("ОШИБКА: Код не найден или истек.");
+                alert("ОШИБКА: Ключ не найден.");
             }
-        } catch (e) { alert("Ошибка сети."); }
+        } catch (e) { alert("Ошибка базы данных."); }
     }
 
-    function showDashboard() {
-        document.getElementById('loginPage').style.display = 'none';
-        document.getElementById('dashboard').style.display = 'block';
-        document.getElementById('subLinkDisplay').innerText = currentUser.sub_link;
-        
-        startTimer(currentUser.expiry);
-    }
-
-    function startTimer(expiryTimestamp) {
-        const timerDisplay = document.getElementById('countdown');
-        function update() {
+    function startClock(expiry) {
+        const clock = document.getElementById('clock');
+        const interval = setInterval(() => {
             const now = Math.floor(Date.now() / 1000);
-            const diff = expiryTimestamp - now;
+            const diff = expiry - now;
+
+            if (expiry > 4000000000) {
+                clock.innerText = "INFINITY (ВЕЧНО)";
+                clearInterval(interval);
+                return;
+            }
 
             if (diff <= 0) {
-                timerDisplay.innerText = "ИСТЕКЛО";
+                clock.innerText = "EXPIRED";
+                clearInterval(interval);
                 return;
             }
 
@@ -89,15 +87,12 @@
             const h = Math.floor((diff % 86400) / 3600);
             const m = Math.floor((diff % 3600) / 60);
             const s = diff % 60;
-
-            timerDisplay.innerText = `${d}д ${h}ч ${m}м ${s}с`;
-        }
-        setInterval(update, 1000);
-        update();
+            clock.innerText = `${d}d ${h}h ${m}m ${s}s`;
+        }, 1000);
     }
 
-    function copySub() {
-        navigator.clipboard.writeText(currentUser.sub_link);
+    function copyLink() {
+        navigator.clipboard.writeText(user.sub_link);
         alert("Ссылка скопирована!");
     }
 </script>
